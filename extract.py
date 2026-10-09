@@ -105,7 +105,7 @@ def get_cert_configurations():
         if folder is None:
             break
         config = {
-            "certs_path": f"{folder}{os.getenv(f'CERT_SUBFOLDER_{idx}', '/certs')}",
+            "certs_path": folder,
             "combined_pem": os.getenv(f"COMBINED_PEM_{idx}", "false").lower() in ("1", "true", "yes"),
             "filename": os.getenv(f"COMBINED_PEM_FILENAME_{idx}", "combined.pem"),
         }
@@ -113,7 +113,7 @@ def get_cert_configurations():
         idx += 1
     if not configs:
         configs.append({
-            "certs_path": f"/output{os.getenv('CERT_SUBFOLDER', '/certs')}",
+            "certs_path": "/output",
             "combined_pem": os.getenv("COMBINED_PEM", "false").lower() in ("1", "true", "yes"),
             "filename": os.getenv("COMBINED_PEM_FILENAME", "combined.pem"),
         })
