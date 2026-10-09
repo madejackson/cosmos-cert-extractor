@@ -177,7 +177,7 @@ def write_certificates(config_obj):
             wrote_any = True
 
         # per-zone certificates: <zone>/cert.pem (or combined.pem) directly
-        # at the root of the output volume (CERT_FOLDER_n mount point).
+        # under the output base.
         for name, cert in sorted(certs_by_zone.items()):
             target = os.path.join(base, name)
             _write_pair_to(config, target, cert["cert"], cert["key"])
