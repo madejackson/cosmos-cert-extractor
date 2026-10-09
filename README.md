@@ -1,6 +1,12 @@
 # cosmos-cert-extractor
 A lightweight Python utility that monitors your [Cosmos](https://github.com/azukaar/Cosmos-Server) configuration file for TLS certificate changes and automatically extracts them for use in other Docker containers.
 
+> [!IMPORTANT]
+> **Fork image (zone-aware).** This fork ships an image built from this repo via GitHub Actions:
+> `ghcr.io/madejackson/cosmos-cert-extractor:latest` (multi-arch: amd64 / arm64).
+> Upstream PR: <https://github.com/waschinski/cosmos-cert-extractor/pull/5>.
+> Use this image instead of `waschinski/cosmos-cert-extractor` if your Cosmos uses per-zone certificates.
+
 > [!NOTE]
 > The script is being triggered on __any__ configuration change in Cosmos. It then compares a fingerprint of every certificate in the config (the top-level `TLSValidUntil` timestamp **and** the full content of every zone / local certificate) with the last known one. Only if something changed (and on every start of the container) the script assumes the cert has been renewed and it is being extracted. This also detects per-zone certificate rotations that happen with an unchanged `TLSValidUntil` timestamp.
 
