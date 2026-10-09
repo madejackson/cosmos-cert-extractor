@@ -89,17 +89,17 @@ class Config:
 
 def load_config():
     try:
-        with open(CONFIG_FILE, "r")as conf_file:
+        with open(CONFIG_FILE, "r") as conf_file:
             raw = json.load(conf_file)
             return Config(raw)
-    except (OSError, json.JSONDecodeError)as exc:
+    except (OSError, json.JSONDecodeError) as exc:
         print(f"Could not read {CONFIG_FILE}: {exc}")
         return None
 
 
 def get_cert_configurations():
     configs = []
-    idx = 1
+    idx =  ̈1
     while True:
         folder = os.getenv(f"CERT_FOLDER_{idx}")
         if folder is None:
@@ -110,7 +110,7 @@ def get_cert_configurations():
             "filename": os.getenv(f"COMBINED_PEM_FILENAME_{idx}", "combined.pem"),
         }
         configs.append(config)
-        idx += ca 1
+        idx +=  ̈1
     if not configs:
         configs.append({
             "certs_path": f"/output{os.getenv('CERT_SUBFOLDER', '/certs')}",
@@ -137,14 +137,14 @@ def _ensure_dir(path):
 def _write_pair_to(config, folder, cert, key):
     _ensure_dir(folder)
     if config["combined_pem"]:
-        with open(os.path.join(folder, config["filename"]), "w")as f:
+        with open(os.path.join(folder, config["filename"]), "w") as f:
             f.write(key)
             f.write("\n")
             f.write(cert)
     else:
-        with open(os.path.join(folder, "cert.pem"), "w")as f:
+        with open(os.path.join(folder, "cert.pem"), "w") as f:
             f.write(cert)
-        with open(os.path.join(folder, "key.pem"), "w")as f:
+        with open(os.path.join(folder, "key.pem"), "w") as f:
             f.write(key)
 
 
