@@ -32,8 +32,6 @@ docker run -d \
   -v /path/to/aliasvault/certs:/output_aliasvault \
   -e CERT_FOLDER_1=/output_dovecot \
   -e CERT_FOLDER_2=/output_aliasvault \
-  -e CERT_SUBFOLDER_1=/ \
-  -e CERT_SUBFOLDER_2=/ \
   -e COMBINED_PEM_2=true \
   waschinski/cosmos-cert-extractor:latest
 ```
@@ -54,15 +52,13 @@ services:
     environment:
       - CERT_FOLDER_1=/output_dovecot
       - CERT_FOLDER_2=/output_aliasvault
-      - CERT_SUBFOLDER_1=/
-      - CERT_SUBFOLDER_2=/
       - COMBINED_PEM_2=true
       - COMBINED_PEM_FILENAME_2=smtp_combined.pem
 ```
 
 ### Volume Mounts
 * /input (Required): Mount your Cosmos data directory (e.g., `/var/lib/cosmos`) to this path. The script will read `cosmos.config.json` from here.
-* Output Paths (Required): Mount the certificate or config directory/volume of each target container to a unique path (e.g., `/output_dovecot`). These paths are then referenced by the `CERT_FOLDER_n` environment variables. If you use the single, unnumbered configuration, the path must be `/output`.
+* Output Paths (Required): Mount the certificate or config directory/volume of each target container to a unique path (e.g., `/output_dovecot`). These paths are then referenced by the `CERT_FOLDER_n` environment variables. Certificates are written directly to the root of that mount (no `certs/` subfolder); see the zones layout below. If you use the single, unnumbered configuration, the path must be `/output`.
 
 ### Example Usage
 The extracted `cert.pem`, `key.pem`, or `combined.pem` files can be used directly by services like AdGuard Home, Omada Controller, or Dovecot. For example, in AdGuard Home, you would point to:
@@ -73,7 +69,7 @@ The extracted `cert.pem`, `key.pem`, or `combined.pem` files can be used directl
 Since Cosmos introduced per-zone certificates (each zone covered by `HTTPConfig.DNSZones` gets a certificate of its own — either a Let's Encrypt one stored in `ZoneCerts`, an HTTP-01 one in `LocalCerts`, or an uploaded one in the zone itself for `PROVIDED` zones), the extractor mirrors that structure:
 
 ```
-<CERT_SUBFOLDER_n>/
+<CERT_FOLDER_n>/
 ├── cert.pem                  # legacy single certificate (top-level TLSCert/TLSKey, when present)
 ├── key.pem
 ├── <zone1>/cert.pem          # per-zone certificate
@@ -94,9 +90,7 @@ This script supports both a single configuration (for backward compatibility) an
 |Environment Variable|Default value|Description|
 |---|---|---|
 |CERT_FOLDER_n|(None)|(Required for multiple configs) The full path to the volume where certificates for instance n should be written (e.g., `/output_dovecot`).|
-|CERT_SUBFOLDER_n|`/certs`|The subdirectory within `CERT_FOLDER_n` where the files will be created.|
 |COMBINED_PEM_n|`false`|If set to `true`, `1`, or `yes`, the script will write a single combined.pem file (key + cert) instead of separate files. This applies to the root certificate as well as to every `<zone>/` directory.|
 |COMBINED_PEM_FILENAME_n|`combined.pem`|The filename for the combined PEM file when `COMBINED_PEM_n` is enabled.|
-|CERT_SUBFOLDER|`/certs`|(Fallback) The subdirectory for the single, unnumbered configuration.|
 |COMBINED_PEM|`false`|(Fallback) The combined PEM setting for the single, unnumbered configuration.|
 |COMBINED_PEM_FILENAME|`combined.pem`|(Fallback) The combined PEM filename for the single, unnumbered configuration.|
