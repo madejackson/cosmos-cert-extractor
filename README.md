@@ -76,18 +76,17 @@ Since Cosmos introduced per-zone certificates (each zone covered by `HTTPConfig.
 <CERT_SUBFOLDER_n>/
 ├── cert.pem                  # legacy single certificate (top-level TLSCert/TLSKey, when present)
 ├── key.pem
-└── zones/
-    ├── <zone1>/cert.pem      # per-zone certificate
-    ├── <zone1>/key.pem
-    ├── <zone2>/cert.pem
-    └── <zone2>/key.pem
+├── <zone1>/cert.pem          # per-zone certificate
+├── <zone1>/key.pem
+├── <zone2>/cert.pem
+└── <zone2>/key.pem
 ```
 
 * **Backward compatible**: if your config has no zones (no `DNSZones`, `ZoneCerts` or `LocalCerts`), the behaviour is identical to before — only `cert.pem`/`key.pem` (or `combined.pem`) at the root.
 * The legacy top-level certificate (still written by Cosmos for the node's own hostname) keeps being extracted to `cert.pem`/`key.pem` at the root.
-* Every zone with a usable certificate (issued, provided, or local) is written under `zones/<zone>/` as `cert.pem`+`key.pem` (or `combined.pem` when `COMBINED_PEM_n` is enabled).
+* Every zone with a usable certificate (issued, provided, or local) is written under `<zone>/` as `cert.pem`+`key.pem` (or `combined.pem` when `COMBINED_PEM_n` is enabled).
 * Zones with `SELFSIGNED` mode or `DISABLED` (HTTP-only) have nothing to extract; their directories are removed if they previously existed, so consumers never serve an outdated certificate.
-* When a zone is removed from the config, its `zones/<zone>/` directory is cleaned up automatically.
+* When a zone is removed from the config, its `<zone>/` directory is cleaned up automatically.
 
 ## Environment Variables
 This script supports both a single configuration (for backward compatibility) and multiple configurations via numbered environment variables.
@@ -96,7 +95,7 @@ This script supports both a single configuration (for backward compatibility) an
 |---|---|---|
 |CERT_FOLDER_n|(None)|(Required for multiple configs) The full path to the volume where certificates for instance n should be written (e.g., `/output_dovecot`).|
 |CERT_SUBFOLDER_n|`/certs`|The subdirectory within `CERT_FOLDER_n` where the files will be created.|
-|COMBINED_PEM_n|`false`|If set to `true`, `1`, or `yes`, the script will write a single combined.pem file (key + cert) instead of separate files. This applies to the root certificate as well as to every `zones/<zone>/` directory.|
+|COMBINED_PEM_n|`false`|If set to `true`, `1`, or `yes`, the script will write a single combined.pem file (key + cert) instead of separate files. This applies to the root certificate as well as to every `<zone>/` directory.|
 |COMBINED_PEM_FILENAME_n|`combined.pem`|The filename for the combined PEM file when `COMBINED_PEM_n` is enabled.|
 |CERT_SUBFOLDER|`/certs`|(Fallback) The subdirectory for the single, unnumbered configuration.|
 |COMBINED_PEM|`false`|(Fallback) The combined PEM setting for the single, unnumbered configuration.|
