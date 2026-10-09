@@ -7,7 +7,8 @@ version: '3.3'
 #    external: true
 services:
   cosmos-cert-extractor:
-    image: 'waschinski/cosmos-cert-extractor:latest'
+    # Fork image (zone-aware): GitHub Container Registry build of this repo.
+    image: 'ghcr.io/madejackson/cosmos-cert-extractor:latest'
     container_name: cosmos-cert-extractor
     restart: always
     volumes:
