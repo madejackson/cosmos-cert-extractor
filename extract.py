@@ -176,25 +176,28 @@ def write_certificates(config_obj):
             _write_pair_to(config, base, legacy["cert"], legacy["key"])
             wrote_any = True
 
-        # per-zone certificates: zones/<zone>/cert.pem (or combined.pem)
-        zone_dir = os.path.join(base, "zones")
+        # per-zone certificates: <zone>/cert.pem (or combined.pem) directly
+        # under the output base.
         for name, cert in sorted(certs_by_zone.items()):
-            target = os.path.join(zone_dir, name)
+            target = os.path.join(base, name)
             _write_pair_to(config, target, cert["cert"], cert["key"])
             wrote_any = True
 
         # Remove stale per-zone directories whose zone no longer has a cert
         # (or was removed from the config entirely), so consumers never serve
         # an outdated certificate after a zone is deleted or becomes HTTP-only.
-        if os.path.isdir(zone_dir):
-            present = set(certs_by_zone.keys())
-            for entry in os.listdir(zone_dir):
-                if entry in present:
-                    continue
-                stale = os.path.join(zone_dir, entry)
-                if os.path.isdir(stale):
-                    shutil.rmtree(stale, ignore_errors=True)
-                    print(f"Removed stale zone certificate directory {stale}.")
+        # Only directories that actually contain cert artifacts are removed, so
+        # unrelated folders in the output base are never touched.
+        present = set(certs_by_zone.keys())
+        for entry in os.listdir(base):
+            if entry in present:
+                continue
+            stale = os.path.join(base, entry)
+            if not os.path.isdir(stale):
+                continue
+            if any(os.path.exists(os.path.join(stale, f)) for f in ("cert.pem", "key.pem", config["filename"])):
+                shutil.rmtree(stale, ignore_errors=True)
+                print(f"Removed stale zone certificate directory {stale}.")
 
         if wrote_any:
             print(f"Cert successfully extracted to {base}.")
